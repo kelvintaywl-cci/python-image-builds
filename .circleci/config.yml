@@ -1,0 +1,33 @@
+version: 2.1
+
+jobs:
+  docker-build:
+    parameters:
+      tag:
+        type: string
+        default: mypython
+      dockerfile:
+        type: string
+        default: Dockerfile
+    resource_class: medium
+    machine:
+      image: ubuntu-2004:202111-02
+    steps:
+      - checkout
+      - run:
+          name: build
+          command:
+            docker build --no-cache -t << parameters.tag >> --file << parameters.dockerfile >> .
+            docker image history << parameters.tag >>
+            docker image ls
+
+workflows:
+  main:
+    jobs:
+      - docker-build:
+          matrix:
+            parameters:
+              dockerfile:
+                - Dockerfile
+                - Dockerfile.slim
+                - Dockerfile.alpine
