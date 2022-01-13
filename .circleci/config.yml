@@ -16,7 +16,7 @@ jobs:
       - checkout
       - run:
           name: build
-          command:
+          command: |
             docker build --no-cache -t << parameters.tag >> --file << parameters.dockerfile >> .
             docker image history << parameters.tag >>
             docker image ls
