@@ -2,7 +2,7 @@ version: 2.1
 
 jobs:
   build-images:
-    resource_class: medium
+    resource_class: large
     docker:
       - image: cimg/python:3.7
     environment:
