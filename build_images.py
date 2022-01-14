@@ -40,7 +40,7 @@ def build_images(*directories):
         (fullpath(dir), f"{IMAGE_TAG_NAMESPACE}/{dir}:{tag}")
         for dir in directories
     ]
-    with multiprocessing.Pool() as pool:
+    with multiprocessing.Pool(4) as pool:
         pool.starmap(_build_image, args)
 
 
