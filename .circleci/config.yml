@@ -24,7 +24,7 @@ jobs:
       - run:
           name: Check images
           command: |
-            docker images ls
+            docker image ls
 
 workflows:
   main:
