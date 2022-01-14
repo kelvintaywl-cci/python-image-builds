@@ -2,16 +2,18 @@ version: 2.1
 
 jobs:
   build-images:
-    resource_class: medium
-    docker:
-      - image: cimg/python:3.7
+    resource_class: large
+    machine:
+      image: ubuntu-2004:202111-02
     environment:
       TAG: '0.0.1'
     steps:
       - checkout
-      - setup_remote_docker:
-          version: 20.10.11
-          docker_layer_caching: false  # for now
+      - run:
+          name: Diagnostics
+          command: |
+            which aws
+            aws --version || true
       - run:
           name: Install dependencies
           command: |
