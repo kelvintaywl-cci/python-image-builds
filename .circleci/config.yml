@@ -14,6 +14,9 @@ jobs:
           command: |
             which aws
             aws --version || true
+            
+            python3 --version
+
       - run:
           name: Install dependencies
           command: |
