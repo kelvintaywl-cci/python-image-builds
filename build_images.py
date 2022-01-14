@@ -1,5 +1,4 @@
 import functools
-# TODO: concurrent builds via multiprocessing
 import multiprocessing
 import os
 import sys
@@ -19,28 +18,30 @@ def fullpath(rel_path: str) -> str:
     return os.path.join(dir_path, rel_path)
 
 
-def _build_image(cli, path: str, img_tag: str, dockerfile: str = "Dockerfile"):
+def _build_image(path: str, img_tag: str, dockerfile: str = "Dockerfile"):
+    cli = client()
     # NOTE: does not emit build output, which may be problematic if trying to debug for caching
     # Otherwise, we may want to use the lower-level API in order to retrieve build outputs.
     # https://docker-py.readthedocs.io/en/stable/images.html#docker.models.images.ImageCollection.build
-    return cli.images.build(
+    cli.images.build(
         path=path,
         nocache=False,  # use cached layers whenever we can
         quiet=False,
         tag=img_tag,
         dockerfile=dockerfile,
     )
-           
+    return True
+
 
 def build_images(*directories):
     tag = os.environ.get("TAG", "latest")
 
-    cli = client()
-    build_image = functools.partial(_build_image, cli)
-
-    for dir in directories:
-        build_image(fullpath(dir), f"{IMAGE_TAG_NAMESPACE}/{dir}:{tag}")
-
+    args = [
+        (fullpath(dir), f"{IMAGE_TAG_NAMESPACE}/{dir}:{tag}")
+        for dir in directories
+    ]
+    with multiprocessing.Pool() as pool:
+        pool.starmap(_build_image, args)
 
 
 if __name__ == "__main__":
