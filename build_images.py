@@ -34,14 +34,15 @@ def _build_image(path: str, img_tag: str, dockerfile: str = "Dockerfile"):
 
 
 def build_images(*directories):
+    # SEQUENTIAL
     tag = os.environ.get("TAG", "latest")
 
     args = [
         (fullpath(dir), f"{IMAGE_TAG_NAMESPACE}/{dir}:{tag}")
         for dir in directories
     ]
-    with multiprocessing.Pool() as pool:
-        pool.starmap(_build_image, args)
+    for arg in args:
+        _build_image(*arg)
 
 
 if __name__ == "__main__":
