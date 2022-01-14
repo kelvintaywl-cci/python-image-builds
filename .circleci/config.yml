@@ -1,33 +1,32 @@
 version: 2.1
 
 jobs:
-  docker-build:
-    parameters:
-      tag:
-        type: string
-        default: mypython
-      dockerfile:
-        type: string
-        default: Dockerfile
+  build-images:
     resource_class: medium
-    machine:
-      image: ubuntu-2004:202111-02
+    docker:
+      - image: cimg/python:3.7
+    environment:
+      TAG: '0.0.1'
     steps:
       - checkout
+      - setup_remote_docker:
+          version: 20.10.11
+          docker_layer_caching: false  # for now
       - run:
-          name: build
+          name: Install dependencies
           command: |
-            docker build --no-cache -t << parameters.tag >> --file << parameters.dockerfile >> .
-            docker image history << parameters.tag >>
-            docker image ls
+            # ideally, use Poetry or Pipenv for Python dependency management
+            pip install -r requirements.txt
+      - run:
+          name: Build images
+          command: |
+            python build_images.py slim nginx
+      - run:
+          name: Check images
+          command: |
+            docker images ls
 
 workflows:
   main:
     jobs:
-      - docker-build:
-          matrix:
-            parameters:
-              dockerfile:
-                - Dockerfile
-                - Dockerfile.slim
-                - Dockerfile.alpine
+      - build-images
