@@ -20,7 +20,7 @@ jobs:
       - run:
           name: Build images
           command: |
-            python build_images.py slim nginx
+            python build_images.py complete slim nginx
       - run:
           name: Check images
           command: |
